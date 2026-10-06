@@ -363,14 +363,11 @@ Make sure sensitive credentials are included in `.gitignore`.
 
 Potential improvements for the project include:
 
-* Persistent vector storage using a production vector database
 * Streaming LLM responses
 * Support for additional document formats
 * Improved document processing and chunking strategies
 * Conversation history management
 * Source citations for retrieved document chunks
-* Rate limiting and API security improvements
-* Production deployment
 * Improved RAG evaluation and retrieval metrics
 
 ## 📄 License
