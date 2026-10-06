@@ -1,6 +1,6 @@
 const { Document, DocumentChunk } = require('../models/Document');
 const { createDocumentChunks } = require('../config/langchain');
-const { addDocumentChunks, deleteDocumentChunks, querySimilarChunks } = require('../config/vectorStore');
+const { addDocumentChunks, querySimilarChunks } = require('../config/vectorStore');
 const fs = require('fs').promises;
 const path = require('path');
 const { PDFLoader } = require('@langchain/community/document_loaders/fs/pdf');
@@ -51,8 +51,15 @@ const uploadDocument = async (req, res) => {
     // Save chunks to MongoDB
     const insertedChunks = await DocumentChunk.insertMany(documentChunks);
 
+    const chunksForVectorStore = insertedChunks.map(chunk => ({
+      documentId: chunk.documentId,
+      content: chunk.content,
+      position: chunk.position,
+      filename: document.filename
+    }));
+
     // Store embeddings in ChromaDB
-    await addDocumentChunks(insertedChunks);
+    await addDocumentChunks(chunksForVectorStore);
 
 
 
