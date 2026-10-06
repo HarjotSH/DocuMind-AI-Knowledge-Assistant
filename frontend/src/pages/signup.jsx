@@ -46,58 +46,73 @@ const Signup = ({ onSignup }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
-      <Card className="w-full max-w-md shadow-xl border-0">
-        <CardHeader className="text-center">
-          <h2 className="text-3xl font-bold text-blue-700 mb-2">Create your account</h2>
+    <div className="flex items-center justify-center min-h-screen bg-slate-50 font-sans">
+      <Card className="w-full max-w-md shadow-2xl border border-slate-200/50 rounded-2xl bg-white/80 backdrop-blur-sm p-2">
+        <CardHeader className="text-center pb-2">
+          <div className="flex justify-center mb-4">
+            <div className="bg-slate-900 p-3 rounded-xl shadow-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">DocuMind</h1>
+          <p className="text-sm text-slate-500 mt-2">Create your account to get started.</p>
         </CardHeader>
         <form onSubmit={handleSignup}>
-          <CardContent className="space-y-5">
-            <div className="relative">
-              <FiMail className="absolute left-3 top-3 text-gray-400" size={20} />
-              <Input
-                type="email"
-                placeholder="Email address"
-                className="pl-10"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
+          <CardContent className="space-y-4 pt-4">
+            <div className="space-y-2">
+              {/* Full name field removed as backend does not require it */}
             </div>
-            <div className="relative">
-              <FiLock className="absolute left-3 top-3 text-gray-400" size={20} />
-              <Input
-                type="password"
-                placeholder="Password"
-                className="pl-10"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-              />
+            <div className="space-y-2">
+              <div className="relative">
+                <FiMail className="absolute left-3 top-3 text-slate-400" size={18} />
+                <Input
+                  type="email"
+                  placeholder="Email address"
+                  className="pl-10 h-11 bg-slate-50/50 border-slate-200 focus-visible:ring-slate-900"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
+              </div>
             </div>
-            <div className="relative">
-              <FiLock className="absolute left-3 top-3 text-gray-400" size={20} />
-              <Input
-                type="password"
-                placeholder="Confirm Password"
-                className="pl-10"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-              />
+            <div className="space-y-2">
+              <div className="relative">
+                <FiLock className="absolute left-3 top-3 text-slate-400" size={18} />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  className="pl-10 h-11 bg-slate-50/50 border-slate-200 focus-visible:ring-slate-900"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
             </div>
-            {error && <div className="text-red-600 text-center text-sm">{error}</div>}
+            <div className="space-y-2">
+              <div className="relative">
+                <FiLock className="absolute left-3 top-3 text-slate-400" size={18} />
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  className="pl-10 h-11 bg-slate-50/50 border-slate-200 focus-visible:ring-slate-900"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
+            </div>
+            {error && <div className="text-red-500 text-center text-sm font-medium bg-red-50 p-2 rounded-md">{error}</div>}
           </CardContent>
-          <CardFooter className="flex flex-col gap-3 mt-4">
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold" disabled={loading}>
-              {loading ? 'Signing up...' : 'Sign Up'}
+          <CardFooter className="flex flex-col gap-4 mt-2 pb-6">
+            <Button type="submit" className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-xl transition-all shadow-md" disabled={loading}>
+              {loading ? 'Creating account...' : 'Create Account'}
             </Button>
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-slate-500">
               Already have an account?{' '}
-              <a href="/login" className="text-blue-600 hover:underline">Login</a>
+              <a href="/login" className="text-slate-900 font-semibold hover:underline decoration-slate-300 underline-offset-4 transition-all">Sign in</a>
             </div>
           </CardFooter>
         </form>
