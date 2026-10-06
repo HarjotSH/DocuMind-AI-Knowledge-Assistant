@@ -49,15 +49,9 @@ const sendMessage = async (req, res) => {
 
 
     const response = await llm.invoke([
-        {
-          role: 'system',
-          content: `You are a helpful AI assistant. Use the following context to answer the user's question: ${context}`
-        },
-        ...conversationHistory,
-        {
-          role: 'user',
-          content: message
-        }
+        ['system', `You are a helpful AI assistant. Use the following context to answer the user's question: ${context}`],
+        ...conversationHistory.map(msg => [msg.role === 'assistant' ? 'ai' : 'human', msg.content]),
+        ['human', message]
       ]);
 
     console.log("Response :", response.content)
