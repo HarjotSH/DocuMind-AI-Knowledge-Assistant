@@ -61,7 +61,7 @@ const addDocumentChunks = async (chunks) => {
   await vectorStore.save(directory);
 };
 
-// Query similar chunks
+// Query similar chunks — deduplicated, relevance-filtered
 const querySimilarChunks = async (query, userId, n = 5) => {
   const vectorStore = await getVectorStore();
 
@@ -70,20 +70,42 @@ const querySimilarChunks = async (query, userId, n = 5) => {
     return [];
   }
 
-  const resultsWithScore = await vectorStore.similaritySearchWithScore(query, n);
-  console.log(resultsWithScore)
-  const results = resultsWithScore.map(([doc, score]) => {
-    doc.score = score; // Attach score to the document object
-    return doc;
-  });
+  // Fetch more candidates than needed so deduplication doesn't leave us empty
+  const candidates = n * 4;
+  const resultsWithScore = await vectorStore.similaritySearchWithScore(query, candidates);
 
-  // Filter results by userId
+  // FAISS returns L2 distance — lower = more similar.
+  // Drop chunks that are too far away (irrelevant). Tune this threshold as needed.
+  const DISTANCE_THRESHOLD = 1.2;
+
+  // Filter by userId first, then by relevance
   const userDocuments = await Document.find({ userId: userId });
   const userDocumentIds = new Set(userDocuments.map(doc => doc._id.toString()));
 
-  return results.filter(doc => userDocumentIds.has(doc.metadata.documentId));
+  const seen = new Set(); // track unique content to remove duplicates
+  const uniqueResults = [];
 
- };
+  for (const [doc, score] of resultsWithScore) {
+    // Skip chunks not belonging to this user
+    if (!userDocumentIds.has(doc.metadata.documentId)) continue;
+
+    // Skip irrelevant chunks
+    if (score > DISTANCE_THRESHOLD) continue;
+
+    // Deduplicate by exact content match
+    const key = doc.pageContent.trim();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    doc.score = score;
+    uniqueResults.push(doc);
+
+    // Stop once we have enough unique relevant chunks
+    if (uniqueResults.length >= n) break;
+  }
+
+  return uniqueResults;
+};
 
 
 

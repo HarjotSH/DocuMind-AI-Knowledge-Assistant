@@ -32,27 +32,36 @@ const sendMessage = async (req, res) => {
       return res.status(404).json({ error: 'Chat session not found' });
     }
 
-    // Find relevant documents
+    // Find relevant documents (already deduplicated + relevance-filtered)
     const relevantDocs = await querySimilarChunks(message, req.user._id);
 
-    // Create context from relevant documents
-    const context = relevantDocs
-      .map(doc => doc.pageContent)
-      .join('\n\n');
+    // Build context — label each chunk with its source file for traceability
+    const context = relevantDocs.length > 0
+      ? relevantDocs
+          .map((doc, i) => `[Source ${i + 1}: ${doc.metadata.filename}]\n${doc.pageContent.trim()}`)
+          .join('\n\n---\n\n')
+      : '';
 
-      // console.log("context is :", context)
+    const systemPrompt = context
+      ? `You are DocuMind, a helpful AI assistant. Answer the user's question using ONLY the context below. 
+If the answer is not in the context, say "I couldn't find relevant information in the uploaded documents."
+
+Context:
+${context}`
+      : `You are DocuMind, a helpful AI assistant. No relevant document context was found for this question. 
+Let the user know they should upload relevant documents first, or rephrase their question.`;
+
     // Prepare conversation history
     const conversationHistory = session.messages.map(msg => ({
       role: msg.role,
       content: msg.content
     }));
 
-
     const response = await llm.invoke([
-        ['system', `You are a helpful AI assistant. Use the following context to answer the user's question: ${context}`],
-        ...conversationHistory.map(msg => [msg.role === 'assistant' ? 'ai' : 'human', msg.content]),
-        ['human', message]
-      ]);
+      ['system', systemPrompt],
+      ...conversationHistory.map(msg => [msg.role === 'assistant' ? 'ai' : 'human', msg.content]),
+      ['human', message]
+    ]);
 
     console.log("Response :", response.content)
     // Save messages to session
