@@ -4,7 +4,7 @@ const {Document} = require('../models/Document');
 const { embeddingsModel } = require('./langchain');
 require('dotenv').config();
 
-// Initialize ChromaDB client with Langchain's Chroma
+// Initialize FAISS vector store
 const getVectorStore = async () => {
   const directory = process.env.FAISS_DB_PATH || './faissdb';
   // Ensure the directory exists
@@ -64,6 +64,11 @@ const addDocumentChunks = async (chunks) => {
 // Query similar chunks
 const querySimilarChunks = async (query, userId, n = 5) => {
   const vectorStore = await getVectorStore();
+
+  // No documents have been uploaded yet
+  if (!vectorStore) {
+    return [];
+  }
 
   const resultsWithScore = await vectorStore.similaritySearchWithScore(query, n);
   console.log(resultsWithScore)

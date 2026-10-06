@@ -1,14 +1,15 @@
+require('dotenv').config();
+
 const { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } = require("@langchain/google-genai");
 const { RecursiveCharacterTextSplitter } = require("@langchain/textsplitters");
 const { Document } = require("@langchain/core/documents");
 const { TaskType } = require("@google/generative-ai");
 
 
-require('dotenv').config();
 
 // Gemini LLM for the response generation
 const llm = new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
+  model: "gemini-3.8-flash",
   temperature: 0, 
   apiKey:process.env.GOOGLE_API_KEY
 });
@@ -21,7 +22,7 @@ const textSplitter = new RecursiveCharacterTextSplitter({
 
 // Google embedding models
 const embeddingsModel = new GoogleGenerativeAIEmbeddings({
-  model: "text-embedding-004", 
+  model: "gemini-embedding-001", 
   taskType: TaskType.RETRIEVAL_DOCUMENT,
   title: "Document title",
   apiKey:process.env.GOOGLE_API_KEY,
